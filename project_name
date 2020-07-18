@@ -15,7 +15,7 @@ _project_name() {
         _append_project_root_dir
     }
 
-    if [[ (-z "${PROJECT_NAME}") || ("${PROJECT_NAME}" == "?") ]]; then
+    if [[ (! -n "${PROJECT_NAME}") || ("${PROJECT_NAME}" == "~") ]]; then
         local GITROOT=$(git rev-parse --show-toplevel 2> /dev/null)
         if [ -n "${GITROOT}" ]; then
             local PROJECT_NAME="${GITROOT:t}"
