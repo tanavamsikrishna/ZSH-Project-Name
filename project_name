@@ -17,7 +17,6 @@ _project_name() {
 
     if [[ (-z "${PROJECT_NAME}") || ("${PROJECT_NAME}" == "?") ]]; then
         local GITROOT=$(git rev-parse --show-toplevel 2> /dev/null)
-        echo $GITROOT
         if [ -n "${GITROOT}" ]; then
             local PROJECT_NAME="${GITROOT:t}"
             local PROJECT_ROOT_DIR="${GITROOT}"
@@ -39,3 +38,4 @@ _project_name() {
 }
 
 chpwd_functions=( _project_name ${chpwd_functions[@]} )
+precmd_functions=( _project_name ${precmd_functions[@]} )
