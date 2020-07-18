@@ -1,9 +1,10 @@
 #!/usr/bin/env zsh
 # Updates the envrc file in a git repo if PROJECT_NAME is not set
-function project_name {
-    function _append_project_name {
-        echo "export PROJECT_NAME=${PROJECT_NAME}" >> "$1"
-    }
+_append_project_name() {
+    print "export PROJECT_NAME=${PROJECT_NAME}" >> "$1"
+}
+
+_project_name() {
     if [[ (-z "${PROJECT_NAME}") || ("${PROJECT_NAME}" == "?") ]]; then
         local GITROOT=$(git rev-parse --show-toplevel 2> /dev/null)
         if [ -n "${GITROOT}" ]; then
@@ -13,6 +14,7 @@ function project_name {
                 rg -qe '^export PROJECT_NAME=' ${ENVRC_FILE}
                 if [ "$?" -ne 0 ]; then
                     _append_project_name $ENVRC_FILE
+                fi
             else
                 _append_project_name $ENVRC_FILE
             fi
@@ -20,4 +22,4 @@ function project_name {
     fi
 }
 
-chpwd_functions=( project_name ${chpwd_functions[@]} )
+chpwd_functions=( _project_name ${chpwd_functions[@]} )
