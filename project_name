@@ -1,22 +1,38 @@
 #!/usr/bin/env zsh
 # Updates the envrc file in a git repo if PROJECT_NAME is not set
-_append_project_name() {
-    print "export PROJECT_NAME=${PROJECT_NAME}" >> "$1"
-}
 
 _project_name() {
+    _append_projct_name() {
+        print "export PROJECT_NAME=${PROJECT_NAME}" >> "$ENVRC_FILE"
+    }
+
+    _append_project_root_dir() {
+        print "export PROJECT_ROOT_DIR=${PROJECT_ROOT_DIR}" >> "$ENVRC_FILE"
+    }
+
+    _append_project_details() {
+        _append_project_name
+        _append_project_root_dir
+    }
+
     if [[ (-z "${PROJECT_NAME}") || ("${PROJECT_NAME}" == "?") ]]; then
         local GITROOT=$(git rev-parse --show-toplevel 2> /dev/null)
+        echo $GITROOT
         if [ -n "${GITROOT}" ]; then
             local PROJECT_NAME="${GITROOT:t}"
+            local PROJECT_ROOT_DIR="${GITROOT}"
             local ENVRC_FILE="${GITROOT}/.envrc"
-            if [ -f "${ENVRC_FILE}" ]; then
-                rg -qe '^export PROJECT_NAME=' ${ENVRC_FILE}
-                if [ "$?" -ne 0 ]; then
-                    _append_project_name $ENVRC_FILE
-                fi
-            else
-                _append_project_name $ENVRC_FILE
+            if [ ! -f "${ENVRC_FILE}" ]; then
+                _append_project_details
+                return
+            fi
+            rg -qe '^export PROJECT_NAME=' ${ENVRC_FILE}
+            if [ "$?" -ne 0 ]; then
+                _append_project_name
+            fi
+            rg -qe '^export PROJECT_ROOT_DIR=' ${ENVRC_FILE}
+            if [ "$?" -ne 0 ]; then
+                _append_project_root_dir
             fi
         fi
     fi
