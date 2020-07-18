@@ -2,24 +2,22 @@
 # Updates the envrc file in a git repo if PROJECT_NAME is not set
 function project_name {
     function _append_project_name {
-        print "export PROJECT_NAME=${PROJECT_NAME}" >> "${PROJECT_ENVRC_FILE}"
+        echo "export PROJECT_NAME=${PROJECT_NAME}" >> "$1"
     }
-    if [ -z "${PROJECT_NAME}" ]; then
+    if [[ (-z "${PROJECT_NAME}") || ("${PROJECT_NAME}" == "?") ]]; then
         local GITROOT=$(git rev-parse --show-toplevel 2> /dev/null)
         if [ -n "${GITROOT}" ]; then
             local PROJECT_NAME="${GITROOT:t}"
-            PROJECT_ENVRC_FILE="${GITROOT}/.envrc"
-            if [ -e "${PROJECT_ENVRC_FILE}" ]; then
-                rg -qe '^export PROJECT_NAME=' "${PROJECT_ENVRC_FILE}"
+            local ENVRC_FILE="${GITROOT}/.envrc"
+            if [ -f "${ENVRC_FILE}" ]; then
+                rg -qe '^export PROJECT_NAME=' ${ENVRC_FILE}
                 if [ "$?" -ne 0 ]; then
-                    _append_project_name
-                    print -P "%F{red}.envrc updated.%f"
-                fi
+                    _append_project_name $ENVRC_FILE
             else
-                _append_project_name
+                _append_project_name $ENVRC_FILE
             fi
         fi
     fi
 }
 
-precmd_functions=(project_name $precmd_functions)
+chpwd_functions=( project_name ${chpwd_functions[@]} )
