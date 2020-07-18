@@ -2,7 +2,7 @@
 # Updates the envrc file in a git repo if PROJECT_NAME is not set
 
 _project_name() {
-    _append_projct_name() {
+    _append_project_name() {
         print "export PROJECT_NAME=${PROJECT_NAME}" >> "$ENVRC_FILE"
     }
 
